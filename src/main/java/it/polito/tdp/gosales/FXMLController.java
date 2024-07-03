@@ -1,9 +1,12 @@
 package it.polito.tdp.gosales;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.gosales.model.Arco;
 import it.polito.tdp.gosales.model.Model;
+import it.polito.tdp.gosales.model.Products;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -27,13 +30,13 @@ public class FXMLController {
     private Button btnCreaGrafo;
 
     @FXML
-    private ComboBox<?> cmbAnno;
+    private ComboBox<Integer> cmbAnno;
 
     @FXML
-    private ComboBox<?> cmbColore;
+    private ComboBox<String> cmbColore;
 
     @FXML
-    private ComboBox<?> cmbProdotto;
+    private ComboBox<Products> cmbProdotto;
 
     @FXML
     private TextArea txtArchi;
@@ -46,12 +49,33 @@ public class FXMLController {
 
     @FXML
     void doCercaPercorso(ActionEvent event) {
-
+    	cmbProdotto.getItems().addAll(model.getVertici());
+    	Products p = cmbProdotto.getValue();
+    	model.trovaPercorso(p);
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    int anno = cmbAnno.getValue();
+    String colore = cmbColore.getValue();
+    if (anno ==0 || colore.compareTo("")==0) {
+    	txtResGrafo.setText("Inserisci un colore e un anno");
+    	return;
+    }
+    model.creaGrafo(anno, colore);
+    txtResGrafo.appendText("#V: "+ model.getV());
+    txtResGrafo.appendText("#A: "+ model.getA());
+    List<Arco> archi = model.getArchi(anno, colore);
+    int N = Math.min(3, archi.size());
+    for (int i =0; i<N; i++) {
+    	txtArchi.appendText(archi.get(i)+"\n");
+    }
+    txtArchi.appendText("\n"+ "I prodotti ripetuti sono: "+"\n");
+    List<Products> ripetuti = model.prodottiRip(anno, colore);
+    for (Products p: ripetuti) {
+    	txtArchi.appendText(p+ " ");
+    }
+    
     }
 
     @FXML
@@ -69,6 +93,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	cmbAnno.getItems().add(2015);
+    	cmbAnno.getItems().add(2016);
+    	cmbAnno.getItems().add(2017);
+    	cmbAnno.getItems().add(2018);
+    	cmbColore.getItems().addAll(model.getColori());
     }
 
 }
